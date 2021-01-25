@@ -1,0 +1,89 @@
+---
+title: "Poland Parliamet Report"
+author: "Ruzza Tomas, Ippolito Fedra, De Luca Simone"
+date: "1/25/2021"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+### Research question
+Do Polish citizens have equal trust in their own Parliament and the European Parliament?
+We test the data from European Social Survey (round 9) looking for evidences. We think that the levels are different in favour of Polish Parliament. 
+```{r Library, echo = FALSE, message= FALSE}
+library("tidyverse")
+poland <- rio::import("ESS9PL.sav")           #importdataset
+poland_sub <- select(poland, trstprl, trstep) #taking variables needed
+#str(poland_sub)                              #check for types of the variables
+#delete missing values
+poland_sub_clean <- filter(poland_sub,
+                           trstprl != c(77, 88, 99, NA))  #delete missing values
+```
+### Distribution of Trust in Polish Parliament
+Those are the results of the distibution: 
+```{r, echo=FALSE}
+#Distribution of the trust in polish parliament
+count(poland_sub_clean, vars = trstprl)
+ggplot(data = poland_sub_clean, aes(x = trstprl)) +  
+  geom_bar(fill = "red")+
+  labs(title = "Trust in polish Parliament", 
+       subtitle = "By polish people",
+       x = "trust", y = "frequency") +
+  scale_x_continuous(breaks = seq(0, 10))
+```
+Trust appears to be not particularly strong, in fact more than half of the citizens have expressed  a level of satisfaction lower than 5/10. In particular, there are only 15 people totally in trust with their own Parliament.
+```{r, echo = FALSE}
+#Overview of Trust in European Parliament
+
+#poland_sub$trstep
+
+poland_sub_clean <- filter(poland_sub,
+                           trstep != c(77, 88, 99, NA))
+```
+
+### Distribution of Trust in European Parliament
+Those are the results of the distibution: 
+```{r}
+count(poland_sub_clean, vars = trstep)
+ggplot(data = poland_sub_clean, aes(x = trstep)) +  
+  geom_bar(fill = "blue")+
+  labs(title = "Trust in EU Parliament", 
+       subtitle = "By polish people",
+       x = "trust", y = "frequency") +
+  scale_x_continuous(breaks = seq(0, 10))
+```
+The results appear to be very similar, therefore we have decided to make a comparison of the means, and this is the reason why we haven't categorized the values of the variables.
+#Comparing the means
+```{r}
+poland_sub_clean %>%
+  summarize_if(is.numeric, ~mean(., na.rm = T))
+```
+Surprisingly we have found that there is more trust into the European Parliament than in the Polish one.
+
+### Linear Model
+A linear model could be useful to verify whether there is a correlation between the variables:
+
+```{r, echo = FALSE}
+linear_analysis <- lm(trstprl ~ trstep,
+                      data = poland_sub_clean)
+```
+```{r}
+summary(linear_analysis)
+```
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(poland_sub_clean, aes(x = trstprl, y = trstep)) +
+  geom_smooth(method = "lm") +
+  theme_bw()
+```
+
+With an r squared of 0.03 we cannot say that a correlation does not exist, but if it does, there is a weak positive linear association as the plot suggests. 
+
+### Conclusions
+
+Our starting hypothesis has been revealed as false, in fact Polish citizens have an higher trust in European Parliament then in their own one. However, it exists a weak relationship between the variables analyzed that suggest that the more citizens trust Polish Parliament, the more trust the European one. 
+
+
+
+
+
+
