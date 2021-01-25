@@ -3,6 +3,7 @@ title: "Poland Parliamet Report"
 author: "Ruzza Tomas, Ippolito Fedra, De Luca Simone"
 date: "1/25/2021"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---
